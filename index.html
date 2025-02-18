@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .content{
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+        }
+        h1 {
+            color: #333;
+        }
+
+        input[type="file"],
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        pre {
+            background-color: #eaeaea;
+            padding: 10px;
+            border: 1px solid #ccc;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        textarea,
+        input[type="text"],
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div>
+            <h1>File to Base64</h1>
+            <input type="file" id="fileInput" />
+            <button id="encodeButton">Encode File</button>
+            <textarea id="output"></textarea>
+        </div>
+        <div>
+            <h1>Base64 to File</h1>
+            <textarea id="base64Input" placeholder="Base64..."></textarea>
+            <input type="text" id="fileName" placeholder="press file name" value="myfile.txt"/>
+            <button id="decodeButton">Decode Base64</button>
+        </div>
+    </div>
+
+    <script>
+        function encodeFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve(reader.result);
+                };
+                reader.onerror = (error) => {
+                    reject(error);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('encodeButton').addEventListener('click', async () => {
+            try {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+    
+                if (file) {
+                    const base64 = await encodeFileToBase64(file);
+                    document.getElementById('output').textContent = base64;
+                } else {
+                    alert('Vui lòng chọn một file để mã hóa.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('exception');
+            }
+        });
+
+        function decodeBase64ToFile(base64Data, fileName) {
+            return fetch(base64Data)
+                .then(res => res.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName || 'file';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+        }
+
+        document.getElementById('decodeButton').addEventListener('click', async () => {
+            try {
+                const base64Data = document.getElementById('base64Input').value;
+                const fileName = document.getElementById('fileName').value;
+    
+                if (base64Data) {
+                    await decodeBase64ToFile(base64Data, fileName);
+                } else {
+                    alert('Vui lòng dán chuỗi Base64 vào ô.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('exception');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -90,11 +90,11 @@
                     const base64 = await encodeFileToBase64(file);
                     document.getElementById('output').textContent = base64;
                 } else {
-                    alert('Vui lòng chọn một file để mã hóa.');
+                    alert('You must specify the File');
                 }
             } catch (error) {
                 console.error(error);
-                alert('exception');
+                alert('Something went wrong');
             }
         });
 
@@ -121,11 +121,11 @@
                 if (base64Data) {
                     await decodeBase64ToFile(base64Data, fileName);
                 } else {
-                    alert('Vui lòng dán chuỗi Base64 vào ô.');
+                    alert('You must specify the Base64 content');
                 }
             } catch (error) {
                 console.error(error);
-                alert('exception');
+                alert('Something went wrong');
             }
         });
     </script>
